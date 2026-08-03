@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "seed": "node scripts/seedVocabulario.js",
     "seed:insignias": "node scripts/seedInsignias.js",
