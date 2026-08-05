@@ -63,7 +63,9 @@ CREATE TABLE public.cuenta (
     rol character varying(15) NOT NULL,
     token_activacion character varying(255),
     cuenta_activa boolean DEFAULT false NOT NULL,
-    creado_en timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    creado_en timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    token_recuperacion character varying(255),
+    token_expira timestamp without time zone
 );
 
 

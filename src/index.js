@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const leccionRoutes = require('./routes/leccionRoutes');
 const progresoRoutes = require('./routes/progresoRoutes');
 const insigniaRoutes = require('./routes/insigniaRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const asyncHandler = require('./middlewares/asyncHandler');
 const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler');
 
@@ -34,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', leccionRoutes);
 app.use('/api', progresoRoutes);
 app.use('/api', insigniaRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) =>{
     res.json({ mensaje: 'Nggigua API funcionando'});
