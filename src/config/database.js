@@ -22,10 +22,19 @@ const pool = process.env.DATABASE_URL
 // pool falla (ej. la DB se cae un instante, se resetea la conexión, etc.).
 // Si nadie escucha ese evento, Node lo trata como excepción no capturada
 // y TUMBA TODO EL PROCESO, no solo esa query. Este listener evita que un
-// hipo de la base de datos derribe el servidor completo.
+// acontesimiento raro de la base de datos derribe el servidor completo.
 pool.on('error', (err) => {
     console.error('[POOL PG] Error inesperado en cliente inactivo:', err);
 });
+
+
+pool.on('connect', (client) => {
+    client.query('SET search_path TO public').catch((err) => {
+        console.error('[POOL PG] No se pudo fijar search_path:', err.message);
+    });
+});
+
+module.exports = pool;
 
 // Algunos proveedores (Neon incluido) configuran el rol de conexión con un
 // search_path vacío por seguridad. Como todo el código de este proyecto usa
@@ -42,10 +51,3 @@ pool.on('error', (err) => {
 // pero es inofensivo: la conexión procesa las queries en el orden en que
 // se enviaron, así que el SET siempre se aplica antes que cualquier query
 // real. Confirmado funcionando en Neon.
-pool.on('connect', (client) => {
-    client.query('SET search_path TO public').catch((err) => {
-        console.error('[POOL PG] No se pudo fijar search_path:', err.message);
-    });
-});
-
-module.exports = pool;

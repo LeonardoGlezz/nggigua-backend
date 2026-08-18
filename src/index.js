@@ -17,6 +17,18 @@ const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Render (como casi cualquier PaaS) pone la app detrás de un proxy inverso:
+// las peticiones le llegan a Express ya "reenviadas", con la IP real del
+// usuario en la cabecera X-Forwarded-For en vez de en la conexión directa.
+// Sin decirle esto a Express explícitamente, express-rate-limit (usado en
+// /login, /registro, /olvide-password, /restablecer-password) rechaza esa
+// cabecera con un ValidationError y tumba la petición completa antes de
+// que llegue al controller — por eso login y recuperación de contraseña
+// fallaban en producción aunque el código y las contraseñas fueran
+// correctos. "1" le dice a Express que confíe en exactamente un salto de
+// proxy (el de Render), ni más ni menos.
+app.set('trust proxy', 1);
+
 // Antes cors() estaba abierto a cualquier origen (*), lo cual está bien
 // para prototipar pero no para producción: cualquier sitio web podría
 // hacer requests autenticados contra esta API desde el navegador de un

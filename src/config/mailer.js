@@ -1,5 +1,14 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 require('dotenv').config({ quiet: true });
+
+// La red de salida de Render (al menos en el plan gratuito) no tiene ruta
+// IPv6, pero Node por defecto puede resolver smtp.gmail.com a una dirección
+// IPv6 primero e intentar conectarse por ahí, fallando con ENETUNREACH antes
+// de siquiera probar IPv4. Forzar el orden de resolución a IPv4 primero
+// evita ese intento fallido. Esto es un ajuste a nivel de proceso, no solo
+// del transporte de correo, pero es inofensivo para el resto de la app.
+dns.setDefaultResultOrder('ipv4first');
 
 // Envío de correos reales (recuperación de contraseña) vía Gmail + App
 // Password. Se eligió esto sobre servicios tipo Resend/SendGrid porque
@@ -15,7 +24,13 @@ require('dotenv').config({ quiet: true });
 //                myaccount.google.com/apppasswords, requiere verificación
 //                en dos pasos activada en esa cuenta)
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    // Refuerzo adicional al ajuste de DNS de arriba: obliga a la conexión
+    // TCP misma a usar IPv4, por si el resolver del entorno ignorara la
+    // preferencia de dns.setDefaultResultOrder.
+    family: 4,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
