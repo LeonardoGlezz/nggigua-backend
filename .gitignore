@@ -1,2 +1,6 @@
 node_modules/
 .env
+*.sql
+!schema.sql
+!datos_iniciales.sql
+!migrations/*.sql
